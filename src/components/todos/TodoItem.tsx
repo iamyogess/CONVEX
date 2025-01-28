@@ -21,6 +21,7 @@ const TodoItem = ({ todo }: { todo: Doc<"todos"> }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
   const updateTodo = useMutation(api.todos.updateTodos);
+  const deleteTodo = useMutation(api.todos.deleteTodos);
 
   const handleUpdate = async (data: TodoFormData) => {
     try {
@@ -39,6 +40,12 @@ const TodoItem = ({ todo }: { todo: Doc<"todos"> }) => {
       title: form.getValues("title"),
       completed: checked,
     });
+  };
+
+  // delete todo
+
+  const handleDelete = async () => {
+    await deleteTodo({ id: todo._id });
   };
 
   const form = useForm<TodoFormData>({
@@ -85,7 +92,7 @@ const TodoItem = ({ todo }: { todo: Doc<"todos"> }) => {
       {form.formState.errors.title && (
         <span>{form.formState.errors.title.message}</span>
       )}
-      <Button variant="destructive">
+      <Button variant="destructive" onClick={handleDelete}>
         <Trash2Icon />
       </Button>
     </Form>
