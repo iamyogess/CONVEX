@@ -1,5 +1,9 @@
 import { mutation, query } from "./_generated/server";
-import { createTodoSchema } from "./../src/lib/zod";
+import {
+  createTodoSchema,
+  deleteTodoSchema,
+  updateTodoSchema,
+} from "./../src/lib/zod";
 import { zCustomMutation } from "convex-helpers/server/zod";
 import { NoOp } from "convex-helpers/server/customFunctions";
 
@@ -23,9 +27,9 @@ export const createTodos = zMutation({
 });
 
 export const updateTodos = zMutation({
-  args: createTodoSchema.shape,
+  args: updateTodoSchema.shape,
   handler: async (ctx, args) => {
-    return ctx.db.insert("todos", {
+    return ctx.db.patch(args.id, {
       title: args.title,
       completed: args.completed,
     });
@@ -33,11 +37,8 @@ export const updateTodos = zMutation({
 });
 
 export const deleteTodos = zMutation({
-  args: createTodoSchema.shape,
+  args: deleteTodoSchema.shape,
   handler: async (ctx, args) => {
-    return ctx.db.insert("todos", {
-      title: args.title,
-      completed: args.completed,
-    });
+    return ctx.db.delete(args.id);
   },
 });

@@ -3,6 +3,7 @@
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import CreateTodo from "./CreateTodo";
+import TodoItem from "./TodoItem";
 
 const TodoList = () => {
   const todos = useQuery(api.todos.getTodos);
@@ -29,7 +30,8 @@ const TodoList = () => {
       <CreateTodo />
       <div className="flex flex-col gap-y-4 justify-center items-center">
         {todos.map((todo) => (
-          <p key={todo._id}>{todo.title}</p>
+          // <p key={todo._id}>{todo.title}</p>
+          <TodoItem key={todo._id} todo={todo} />
         ))}
       </div>
     </div>
