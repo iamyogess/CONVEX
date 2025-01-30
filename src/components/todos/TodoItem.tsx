@@ -1,5 +1,4 @@
 "use client";
-// import { cn } from "@/lib/utils";
 import { Checkbox } from "../ui/checkbox";
 import { useState } from "react";
 import { updateTodoSchema } from "@/lib/zod";
@@ -19,7 +18,6 @@ type TodoFormData = z.infer<typeof updateTodoSchema>;
 const TodoItem = ({ todo }: { todo: Doc<"todos"> }) => {
   const [isChecked, setIsChecked] = useState<boolean>(todo.completed);
   const [isEditing, setIsEditing] = useState<boolean>(false);
-
   const updateTodo = useMutation(api.todos.updateTodos);
   const deleteTodo = useMutation(api.todos.deleteTodos);
 
@@ -42,8 +40,6 @@ const TodoItem = ({ todo }: { todo: Doc<"todos"> }) => {
     });
   };
 
-  // delete todo
-
   const handleDelete = async () => {
     await deleteTodo({ id: todo._id });
   };
@@ -59,42 +55,65 @@ const TodoItem = ({ todo }: { todo: Doc<"todos"> }) => {
 
   return (
     <Form {...form}>
-      <div>
-        <Checkbox onCheckedChange={handleToggle} checked={isChecked} />
-      </div>
+      <div className="group relative flex items-center gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-gray-300 hover:shadow-md">
+        <div className="flex items-center">
+          <Checkbox 
+            onCheckedChange={handleToggle} 
+            checked={isChecked}
+            className="h-5 w-5 rounded border-gray-300 transition-colors data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+          />
+        </div>
 
-      <div className="flex-1">
-        {isEditing ? (
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <form action="" onSubmit={form.handleSubmit(handleUpdate)}>
-                    <Input {...field} type="text" autoFocus />
-                  </form>
-                </FormControl>
-              </FormItem>
-            )}
-          ></FormField>
-        ) : (
-          <span
-            onClick={() => {
-              if (!isEditing) setIsEditing(true);
-            }}
-          >
-            {form.getValues("title")}
-          </span>
-        )}
-      </div>
+        <div className="flex-1">
+          {isEditing ? (
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <form action="" onSubmit={form.handleSubmit(handleUpdate)}>
+                      <Input 
+                        {...field} 
+                        type="text" 
+                        autoFocus
+                        className="h-9 rounded-md border-gray-200 bg-gray-50 px-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
+                      />
+                    </form>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          ) : (
+            <span
+              onClick={() => {
+                if (!isEditing && !isChecked) setIsEditing(true);
+              }}
+              className={`cursor-pointer text-sm transition-all ${
+                isChecked 
+                  ? 'text-gray-400 line-through' 
+                  : 'text-gray-700 hover:text-gray-900'
+              }`}
+            >
+              {form.getValues("title")}
+            </span>
+          )}
+          
+          {form.formState.errors.title && (
+            <span className="mt-1 text-xs text-red-500">
+              {form.formState.errors.title.message}
+            </span>
+          )}
+        </div>
 
-      {form.formState.errors.title && (
-        <span>{form.formState.errors.title.message}</span>
-      )}
-      <Button variant="destructive" onClick={handleDelete}>
-        <Trash2Icon />
-      </Button>
+        <Button 
+          variant="ghost" 
+          onClick={handleDelete}
+          className="h-8 w-8 rounded-full p-0 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
+        >
+          <Trash2Icon className="h-4 w-4" />
+        </Button>
+      </div>
     </Form>
   );
 };
